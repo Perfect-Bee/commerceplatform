@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.Random;
 
 // 가렌과 에쉬에서 중복되는 필드변수값 모두 모으기
@@ -9,8 +10,9 @@ public abstract class Champion {
     private int attackDamage;   // 공격력
     private int defence;        // 방어력
 
-    // 전투 카운트(챔피언 공유)
-    private static int battleCount = 0;
+    // 부활용
+    // 체력 저장
+    private int maxhp;
 
     // 생성자는 이름만 다름.
     public Champion(String name, int hp, int attackDamage, int defence) {
@@ -19,56 +21,56 @@ public abstract class Champion {
         this.hp = hp;
         this.attackDamage = attackDamage;
         this.defence = defence;
+        // 부활을 위한 최대 체력
+        this.maxhp = hp;
     }
-
-    // 피해량
-    // + 치명타 적용
-    private Random random = new Random();
-
-    public void takeDamage(int damage){
-        // 치명타 적용 데미지 : ranAD
-        int ranAD = attackDamage * 2;
-        int actualDamage;
-
-        // 치명타 판정 : 20%(0.2)
-        if (random.nextDouble() < GameConstants.CRITICAL_CHANCE) {
-            actualDamage = damage - ranAD;
-            System.out.println("치명타 발생!");
-        } else {
-            actualDamage = damage - this.defence;
-        }
-        // 내 체력 - (내 방어력 - 적의 공격력) : 내 체력 - 실제 데미지
-        if( actualDamage < 0 ) actualDamage = 0;
-        this.hp -= actualDamage;
-        if (this.hp <= 0) {
-            System.out.println( this.name + "이(가) 사망하였습니다!");
-            hp = 0; // 초기화
-        }
-        System.out.println(this.name + "의 현재 체력: " + this.hp + "\n");
-        // 기본 공격/스킬 사용시
-        // 즉 피해 받음 : 카운트 +1
-        battleCount ++;
-    }
-
     // 체력, 이름 설정(Getter)도 같음
     // 체력 메소드
-    public int getHp(){
-        return this.hp;
-    }
-
+    public int getHp(){return this.hp;}
     // 이름 메소드
-    public String getName(){
-        return this.name;
-    }
+    public String getName(){return this.name;}
+    // setter
     // 이름 변경 메소드
     public void changeName(String name){
         // 현재 설정된 이름(private 씌운)에 name 덮어쓰기
         this.name = name;
         System.out.println("변경된 이름은 : " + this.name);
     }
+    public void setHp(int hp){this.hp = hp;}
+
     // 공격력 메소드
-    public int getAttackDamage(){
-        return this.attackDamage;
+    public int getAttackDamage(){return this.attackDamage;}
+    // 피해량
+    // + 치명타 적용
+    private Random random = new Random();
+
+    public void takeDamage(int damage){
+        int actualDamage = damage - this.defence;
+
+        // 실제 데미지(적 공격력 - 내 방어력)
+        // 치명타 판정 : 20%(0.2) -> 2배
+        if (random.nextDouble() < GameConstants.CRITICAL_CHANCE) {
+            actualDamage *= 2;
+            System.out.println("치명타 피해량 : " + actualDamage);
+        } else {
+            System.out.println("피해량 : " + actualDamage);
+        }
+        // 내 체력 - (내 방어력 - 적의 공격력) : 내 체력 - 실제 데미지
+        if( actualDamage < 0 ) actualDamage = 0;
+        this.hp -= actualDamage;
+
+
+        if (this.hp <= 0) {
+            System.out.println( this.name + "이(가) 사망하였습니다!");
+            hp = 0; // 초기화
+            resurrect();
+            return;
+        }
+        System.out.println(this.name + "의 현재 체력: " + this.hp + "\n");
+
+        // 기본 공격/스킬 사용시
+        // 즉 피해 받음 : 카운트 +1
+        GameConstants.BATTLE_COUNT++;
     }
 
     // 다형성을 사용하면 타격에 대해서도 묶을 수 있다.
@@ -89,9 +91,18 @@ public abstract class Champion {
         System.out.println("level : " + this.level + "\n" +
                 "hp : " + this.hp + "\n" + "attackDamage : " + this.attackDamage + "\n" + "defence : " + this.defence );
     }
+    // 부활 로직
+    public final void resurrect() {
+        // 혹시 모르니까 살아있는 경우 반환
+        if (this.hp > 0) {return;}
+        // 고정 규칙: 최대 체력의 20% (최소 1)
+        int reviveHp = (int)(this.maxhp * 0.2);
+        if (reviveHp < 1) reviveHp = 1;
 
-    // 고정된 부활 추가
-    final void resurrect(){}
+        this.hp = reviveHp;
+
+        System.out.println(this.name + "이(가) 부활했습니다! (체력: " + this.hp + ")");
+    }
 
     // 스킬
     // 내부 로직은 알아서하되, useQ는 모든 챔피언이 사용하니까

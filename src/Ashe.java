@@ -31,7 +31,7 @@ public class Ashe extends Champion implements RangeChampion {
         target.takeDamage(getAttackDamage() * 5);
     }
 
-    // implements RangeChampion 추가했으니 오버라이드 체크
+    // implements champion.RangeChampion 추가했으니 오버라이드 체크
     @Override
     public void kite(){
 

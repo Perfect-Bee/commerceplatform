@@ -1,4 +1,4 @@
-public class Garen extends Champion implements MeleeChampion{
+public class Garen extends Champion implements MeleeChampion {
 // Garen이 Champion의 것을 상속받음
 
     // Garen를 위한 생성자 재설정
