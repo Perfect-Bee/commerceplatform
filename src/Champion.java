@@ -1,3 +1,5 @@
+import java.util.Random;
+
 // 가렌과 에쉬에서 중복되는 필드변수값 모두 모으기
 // 모으고나서 public class [가렌/에쉬] 이것만 뒤에 extends Champion 붙이자.
 public abstract class Champion {
@@ -17,15 +19,29 @@ public abstract class Champion {
     }
 
     // 피해량
+    // + 치명타 적용
+    private Random rd = new Random();
+
     public void takeDamage(int damage){
+        // 치명타 적용 데미지 : ranAD
+        int ranAD = attackDamage * 2;
+        int actualDamage;
+
+        // 치명타 판정
+        if (Math.random() < GameConstants.CRITICAL_CHANCE) {
+            actualDamage = damage - ranAD;
+            System.out.println("치명타 발생!");
+        } else {
+            actualDamage = damage - this.defence;
+        }
         // 내 체력 - (내 방어력 - 적의 공격력) : 내 체력 - 실제 데미지
-        int actualDamage = damage - this.defence;   // this.는 private에 숨겨진 이 클래스의 defense(따로 defense 설정해도 그거랑 이거랑 다름)
-        if( actualDamage < 0 ) actualDamage = 0;    // if(A) B = 0; -> A이면 B=0이다. : 방어력이 공격력보다 높으면 데미지는 0
-
-        this.hp -= actualDamage; // 내 체력에서 데미지 뺌(hp = hp - actualDamage)
-
-        System.out.println("[ " + this.name + " ]" + "이(가) " + actualDamage + " 피해를 받았습니다!");
-        System.out.println("현재 체력: " + this.hp);
+        if( actualDamage < 0 ) actualDamage = 0;
+        this.hp -= actualDamage;
+        if (this.hp <= 0) {
+            System.out.println( this.name + "이(가) 사망하였습니다!");
+            hp = 0; // 초기화
+        }
+        System.out.println(this.name + "의 현재 체력: " + this.hp + "\n");
     }
 
     // 체력, 이름 설정(Getter)도 같음
@@ -64,5 +80,15 @@ public abstract class Champion {
     public void basicAttack(Champion target){
         System.out.println("[ " + getName() + " ]" + "이(가) " + "[ " + target.getName() + " ]" + "을(를) 기본 공격!");
         target.takeDamage(this.attackDamage);
+    }
+
+    // 레밸업!
+    public void levelUp(Champion target) {
+        this.level++;              // 레밸
+        this.hp += 50;             // 체력
+        this.attackDamage += 10;   // 공격력
+        this.defence += 5;         // 방어력
+        System.out.println("level : " + this.level + "\n" +
+                "hp : " + this.hp + "\n" + "attackDamage : " + this.attackDamage + "\n" + "defence : " + this.defence );
     }
 }
