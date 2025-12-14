@@ -9,7 +9,7 @@ public class GameConstants {
     public static final int GAREN_AD = 50;
     public static final int GAREN_DF = 30;
     // 애쉬
-    public static final int ASHED_HP = 80;
-    public static final int ASHED_AD = 60;
-    public static final int ASHED_DF = 10;
+    public static final int ASHE_HP = 80;
+    public static final int ASHE_AD = 60;
+    public static final int ASHE_DF = 10;
 }
