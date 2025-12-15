@@ -1,4 +1,4 @@
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 
 // 가렌과 에쉬에서 중복되는 필드변수값 모두 모으기
@@ -34,7 +34,7 @@ public abstract class Champion {
     public void changeName(String name){
         // 현재 설정된 이름(private 씌운)에 name 덮어쓰기
         this.name = name;
-        System.out.println("변경된 이름은 : " + this.name);
+        new Log("변경된 이름은 : " + this.name);
     }
     public void setHp(int hp){this.hp = hp;}
 
@@ -51,9 +51,9 @@ public abstract class Champion {
         // 치명타 판정 : 20%(0.2) -> 2배
         if (random.nextDouble() < GameConstants.CRITICAL_CHANCE) {
             actualDamage *= 2;
-            System.out.println("치명타 피해량 : " + actualDamage);
+            new Log("치명타 피해량 : " + actualDamage);
         } else {
-            System.out.println("피해량 : " + actualDamage);
+            new Log("피해량 : " + actualDamage);
         }
         // 내 체력 - (내 방어력 - 적의 공격력) : 내 체력 - 실제 데미지
         if( actualDamage < 0 ) actualDamage = 0;
@@ -61,22 +61,19 @@ public abstract class Champion {
 
 
         if (this.hp <= 0) {
-            System.out.println( this.name + "이(가) 사망하였습니다!");
+            new Log( this.name + "이(가) 사망하였습니다!");
             hp = 0; // 초기화
             resurrect();
             return;
         }
-        System.out.println(this.name + "의 현재 체력: " + this.hp + "\n");
+        new Log(this.name + "의 현재 체력: " + this.hp + "\n");
 
         // 기본 공격/스킬 사용시
         // 즉 피해 받음 : 카운트 +1
         GameConstants.BATTLE_COUNT++;
     }
-
-    // 다형성을 사용하면 타격에 대해서도 묶을 수 있다.
-    // 상속으로 분리한 이유 : 중복되는 부분을 일관화
-    // 가렌 = 챔피언, 에쉬 = 챔피언
-    // 따라서 가렌이 에쉬를 공격한다 = 챔피언이 챔피언을 공격한다.
+    
+    // 공격
     public void basicAttack(Champion target){
         System.out.println("[ " + getName() + " ]" + "이(가) " + "[ " + target.getName() + " ]" + "을(를) 기본 공격!");
         target.takeDamage(this.attackDamage);
@@ -88,7 +85,7 @@ public abstract class Champion {
         this.hp += 50;             // 체력
         this.attackDamage += 10;   // 공격력
         this.defence += 5;         // 방어력
-        System.out.println("level : " + this.level + "\n" +
+        new Log("level : " + this.level + "\n" +
                 "hp : " + this.hp + "\n" + "attackDamage : " + this.attackDamage + "\n" + "defence : " + this.defence );
     }
     // 부활 로직
@@ -101,7 +98,19 @@ public abstract class Champion {
 
         this.hp = reviveHp;
 
-        System.out.println(this.name + "이(가) 부활했습니다! (체력: " + this.hp + ")");
+        new Log(this.name + "이(가) 부활했습니다! (체력: " + this.hp + ")");
+    }
+    // 전투 로그 : 리스트에 받은 메시지 넣어서 출력
+    public static class Log {
+        private static ArrayList<String> logs = new ArrayList<>();
+        private final String message;
+        // final 정의된 변수를 생성자에서 초기화시킴(자동화 완성됨...)
+        public Log(String message) {
+            this.message = message;
+            System.out.println(message);
+        }
+        // 여기까지 입력받은 메시지에 대한 로그
+        // 전투 로그를 static 중첩 로그 : System.out.pringln -> new Log
     }
 
     // 스킬
