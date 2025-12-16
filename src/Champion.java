@@ -81,6 +81,10 @@ public abstract class Champion {
 
     // 레밸업!
     public void levelUp(Champion target) {
+        if (this.level > GameConstants.MAX_LEVEL) {
+            new Log("레밸 상한에 도달하였습니다");
+            return;
+        }
         this.level++;              // 레밸
         this.hp += 50;             // 체력
         this.attackDamage += 10;   // 공격력
