@@ -81,7 +81,7 @@ public abstract class Champion {
 
     // 레밸업!
     public void levelUp(Champion target) {
-        if (this.level > GameConstants.MAX_LEVEL) {
+        if (this.level >= GameConstants.MAX_LEVEL) {
             new Log("레밸 상한에 도달하였습니다");
             return;
         }
